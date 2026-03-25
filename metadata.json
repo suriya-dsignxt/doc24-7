@@ -1,0 +1,8 @@
+{
+  "name": "Doc 24/7",
+  "description": "A premium digital sanctuary for health, connecting patients with top-tier medical specialists anytime, anywhere.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
