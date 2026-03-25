@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Search, Video, UserSearch, FileUp, Heart, Baby, Brain, Bone, Sparkles, Eye, ArrowRight, Star, MapPin, Briefcase, Quote } from 'lucide-react';
 import { DOCTORS } from '../constants';
@@ -8,6 +9,16 @@ interface HomeProps {
 }
 
 export default function Home({ onNavigate }: HomeProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      onNavigate('find-doctors', { search: searchQuery });
+    } else {
+      onNavigate('find-doctors');
+    }
+  };
+
   const specialties = [
     { icon: Heart, label: 'Cardiology', color: 'text-error', bg: 'bg-error-container/20' },
     { icon: Baby, label: 'Pediatrics', color: 'text-secondary', bg: 'bg-secondary-container/20' },
@@ -89,9 +100,17 @@ export default function Home({ onNavigate }: HomeProps) {
               className="w-full bg-transparent border-none focus:ring-0 text-on-surface placeholder:text-outline py-4" 
               placeholder="Search doctors, clinics, symptoms..." 
               type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
             />
           </div>
-          <button className="bg-primary text-on-primary px-8 py-3 rounded-full font-bold active:scale-95 transition-all">Search</button>
+          <button 
+            onClick={handleSearch}
+            className="bg-primary text-on-primary px-8 py-3 rounded-full font-bold active:scale-95 transition-all"
+          >
+            Search
+          </button>
         </div>
       </div>
 
@@ -129,7 +148,10 @@ export default function Home({ onNavigate }: HomeProps) {
               <p className="text-on-surface-variant text-sm">Browse by expertise and rating.</p>
             </div>
             
-            <div className="md:col-span-2 bg-secondary-container p-8 rounded-lg flex items-center justify-between group cursor-pointer hover:shadow-xl transition-all">
+            <div 
+              onClick={() => onNavigate('dashboard')}
+              className="md:col-span-2 bg-secondary-container p-8 rounded-lg flex items-center justify-between group cursor-pointer hover:shadow-xl transition-all"
+            >
               <div className="flex items-center gap-6">
                 <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-inner">
                   <FileUp className="w-8 h-8 text-secondary" />
@@ -154,7 +176,11 @@ export default function Home({ onNavigate }: HomeProps) {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
             {specialties.map((s, i) => (
-              <div key={i} className="flex flex-col items-center p-8 rounded-lg hover:bg-surface-container-low transition-all cursor-pointer group">
+              <div 
+                key={i} 
+                onClick={() => onNavigate('find-doctors', { specialty: s.label })}
+                className="flex flex-col items-center p-8 rounded-lg hover:bg-surface-container-low transition-all cursor-pointer group"
+              >
                 <div className={cn("w-20 h-20 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform", s.bg)}>
                   <s.icon className={cn("w-10 h-10", s.color)} />
                 </div>

@@ -4,10 +4,11 @@ import { PRESCRIPTIONS, REPORTS } from '../constants';
 import { cn } from '@/src/lib/utils';
 
 interface DashboardProps {
-  onNavigate: (page: string) => void;
+  onNavigate: (page: string, params?: any) => void;
+  appointments: any[];
 }
 
-export default function Dashboard({ onNavigate }: DashboardProps) {
+export default function Dashboard({ onNavigate, appointments }: DashboardProps) {
   const stats = [
     { label: 'Heart Rate', value: '72', unit: 'bpm', icon: Heart, color: 'text-error', bg: 'bg-error-container/20', trend: '+2%', trendUp: true },
     { label: 'Blood Pressure', value: '120/80', unit: 'mmHg', icon: Activity, color: 'text-primary', bg: 'bg-primary-container/10', trend: '-1%', trendUp: false },
@@ -70,44 +71,67 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           <section>
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-2xl font-bold">Upcoming Appointments</h2>
-              <button className="text-primary font-bold text-sm hover:underline">View All</button>
+              <button 
+                onClick={() => onNavigate('find-doctors')}
+                className="text-primary font-bold text-sm hover:underline"
+              >
+                Book New
+              </button>
             </div>
             <div className="space-y-4">
-              <div className="bg-gradient-to-br from-primary to-primary-container p-8 rounded-xl text-on-primary shadow-xl shadow-primary/20 flex flex-col md:flex-row justify-between items-center gap-8">
-                <div className="flex items-center gap-6">
-                  <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-white/20 shadow-inner">
-                    <img 
-                      alt="Doctor" 
-                      className="w-full h-full object-cover"
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuBh1BVn0lTBjLc1a4kgX6e9kvPiYcRYWWt8tmz-xAhR63h8qCWXlBXcO4fmq1IzCawvDoIDKNqZi1raSn4AxWVAYf7qxDggRLk1tn5H_6fqy5DD8j3TcPcpjaNVFImoT1N5GeHUqtjxDt2qCF8gg-yz0N9P97zpKVB15azfZ-21Ah2lkIiraZvI7tsYWSElEIfiUbYvtTLRNOaJAFnDK5S8cWlAJ4dBTgPjO046w5jjpBo4pdo2UGUAyJhAhYRczZSa-ZqphiIeQxg"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold uppercase tracking-widest opacity-70 mb-1">Next Consultation</div>
-                    <h3 className="text-2xl font-bold mb-2">Dr. Julianne Thorne</h3>
-                    <p className="opacity-80 font-medium">Cardiology • St. Mary's Hospital</p>
-                  </div>
-                </div>
-                <div className="flex flex-col md:flex-row items-center gap-8">
-                  <div className="text-center md:text-right">
-                    <div className="flex items-center gap-2 justify-center md:justify-end mb-1">
-                      <Calendar className="w-4 h-4" />
-                      <span className="font-bold">Today, Mar 25</span>
+              {appointments.length > 0 ? (
+                appointments.map((apt, idx) => (
+                  <div key={apt.id || idx} className="bg-gradient-to-br from-primary to-primary-container p-8 rounded-xl text-on-primary shadow-xl shadow-primary/20 flex flex-col md:flex-row justify-between items-center gap-8">
+                    <div className="flex items-center gap-6">
+                      <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-white/20 shadow-inner">
+                        <img 
+                          alt={apt.doctorName} 
+                          className="w-full h-full object-cover"
+                          src={apt.doctorImage}
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold uppercase tracking-widest opacity-70 mb-1">
+                          {idx === 0 ? 'Next Consultation' : 'Upcoming'}
+                        </div>
+                        <h3 className="text-2xl font-bold mb-2">{apt.doctorName}</h3>
+                        <p className="opacity-80 font-medium">{apt.doctorTitle} • {apt.hospital}</p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 justify-center md:justify-end">
-                      <Clock className="w-4 h-4" />
-                      <span className="font-bold">04:30 PM</span>
+                    <div className="flex flex-col md:flex-row items-center gap-8">
+                      <div className="text-center md:text-right">
+                        <div className="flex items-center gap-2 justify-center md:justify-end mb-1">
+                          <Calendar className="w-4 h-4" />
+                          <span className="font-bold">{apt.date}</span>
+                        </div>
+                        <div className="flex items-center gap-2 justify-center md:justify-end">
+                          <Clock className="w-4 h-4" />
+                          <span className="font-bold">{apt.time}</span>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => onNavigate('consultation', { doctorId: apt.doctorId })}
+                        className="px-8 py-4 bg-white text-primary rounded-full font-bold shadow-lg hover:scale-105 active:scale-95 transition-all"
+                      >
+                        Join Call
+                      </button>
                     </div>
                   </div>
+                ))
+              ) : (
+                <div className="bg-surface-container-low p-12 rounded-xl border border-dashed border-outline-variant text-center">
+                  <Calendar className="w-12 h-12 text-on-surface-variant mx-auto mb-4 opacity-20" />
+                  <h3 className="text-xl font-bold mb-2">No upcoming appointments</h3>
+                  <p className="text-on-surface-variant mb-6">Schedule your first consultation today.</p>
                   <button 
-                    onClick={() => onNavigate('consultation')}
-                    className="px-8 py-4 bg-white text-primary rounded-full font-bold shadow-lg hover:scale-105 active:scale-95 transition-all"
+                    onClick={() => onNavigate('find-doctors')}
+                    className="px-8 py-3 bg-primary text-on-primary rounded-full font-bold shadow-lg"
                   >
-                    Join Call
+                    Find a Doctor
                   </button>
                 </div>
-              </div>
+              )}
             </div>
           </section>
 

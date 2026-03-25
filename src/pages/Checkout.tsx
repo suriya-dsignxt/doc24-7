@@ -8,9 +8,10 @@ interface CheckoutProps {
   date: string;
   time: string;
   onNavigate: (page: string) => void;
+  onConfirm: (appointment: any) => void;
 }
 
-export default function Checkout({ doctorId, date, time, onNavigate }: CheckoutProps) {
+export default function Checkout({ doctorId, date, time, onNavigate, onConfirm }: CheckoutProps) {
   const doctor = DOCTORS.find(d => d.id === doctorId) || DOCTORS[0];
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -21,6 +22,15 @@ export default function Checkout({ doctorId, date, time, onNavigate }: CheckoutP
     setTimeout(() => {
       setIsProcessing(false);
       setIsSuccess(true);
+      onConfirm({
+        doctorName: doctor.name,
+        doctorTitle: doctor.title,
+        doctorImage: doctor.image,
+        hospital: doctor.hospital,
+        date,
+        time,
+        doctorId: doctor.id
+      });
     }, 2000);
   };
 
